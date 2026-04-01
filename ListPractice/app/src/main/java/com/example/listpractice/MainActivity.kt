@@ -32,6 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.listpractice.ui.theme.ListPracticeTheme
+import com.example.listpractice.data.Member
+import com.example.listpractice.data.members
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +48,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun StudentList(students: List<String>, paddingValues: PaddingValues) {
+fun StudentList(students: List<Member>, paddingValues: PaddingValues) {
     LazyColumn(
         contentPadding = paddingValues,
         modifier = Modifier.fillMaxSize()
@@ -65,7 +67,7 @@ fun StudentList(students: List<String>, paddingValues: PaddingValues) {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = student,
+                    text = student.name,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 )
             }
@@ -98,7 +100,7 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        StudentList(students, paddingValues = innerPadding)
+        StudentList(members, paddingValues = innerPadding)
     }
 }
 
@@ -111,7 +113,7 @@ fun UserProfileImage(imageUr: String){
             .size(80.dp)
             .clip(CircleShape),
         contentScale = ContentScale.Crop,
-        placeholder = painterResource(R.drawable.outline_downloading_24),
+        placeholder = painterResource(R.drawable.outline_arrow_downward_24),
         error = painterResource(R.drawable.outline_error_24)
     )
 }
