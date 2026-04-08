@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -23,17 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.example.listpractice.ui.theme.ListPracticeTheme
-import com.example.listpractice.data.Member
-import com.example.listpractice.data.members
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,84 +39,59 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun StudentList(students: List<Member>, paddingValues: PaddingValues) {
-    LazyColumn(
-        contentPadding = paddingValues,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        item {
-            Text(
-                text = "Students",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        items(students) { student ->
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = student.name,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-                )
-            }
-        }
-    }
-}
-
+// Material 3 Top Appbar 사용
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-    val students = remember { listOf("AAA", "BBB", "CCC", "DDD", "EEE", "FFF") }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("List Practice") },
+                title = { Text("리스트 실습") },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* todo */ },
+                onClick = { /* TODO */ },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(painterResource(id = R.drawable.outline_add_24), contentDescription = "Add")
+                Icon(painterResource(R.drawable.outline_add_24), contentDescription = "Add")
             }
         }
     ) { innerPadding ->
-        StudentList(members, paddingValues = innerPadding)
+        val students = listOf("AAA", "BBB", "CCC", "DDD", "EEE", "FFF")
+        StudentList(students = students, paddingValues = innerPadding)
     }
 }
 
 @Composable
-fun UserProfileImage(imageUr: String){
-    AsyncImage(
-        model = imageUr,
-        contentDescription = "user profile img",
-        modifier = Modifier
-            .size(80.dp)
-            .clip(CircleShape),
-        contentScale = ContentScale.Crop,
-        placeholder = painterResource(R.drawable.outline_arrow_downward_24),
-        error = painterResource(R.drawable.outline_error_24)
-    )
+fun StudentList(students: List<String>, paddingValues: PaddingValues) {
+    LazyColumn(
+        modifier = Modifier.padding(paddingValues)
+    ) {
+        item { Text("Students", modifier = Modifier.padding(10.dp)) }
+        items(students) { student ->
+            Card(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    student,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 60.dp)
+                )
+            }
+        }
+    }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    ListPracticeTheme() {
+    ListPracticeTheme {
         MainScreen()
     }
 }
-
-
