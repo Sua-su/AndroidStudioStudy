@@ -22,7 +22,7 @@ import com.example.contacts.ui.components.ContactListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactListScreen(contacts: List<Contact>, onContactClick: (Int) -> Unit) {
+fun ContactListScreen(keyword:String, updateKeyword:(String) -> Unit, contacts: List<Contact>, onContactClick: (Int) -> Unit) {
 
     Scaffold(
         topBar = {
@@ -41,9 +41,9 @@ fun ContactListScreen(contacts: List<Contact>, onContactClick: (Int) -> Unit) {
                 .padding(innerPadding)
         ) {
             TextField(
-                value = query.value,
+                value = keyword,
                 placeholder = { Text("enter keyword") },
-                onValueChange = { query.value = it },
+                onValueChange = { updateKeyword(it) },
                 modifier = Modifier.fillMaxWidth()
             )
             LazyColumn(
