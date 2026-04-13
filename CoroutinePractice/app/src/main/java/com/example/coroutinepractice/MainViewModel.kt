@@ -14,8 +14,16 @@ class MainViewModel: ViewModel() {
     private val _nowState = MutableStateFlow(LocalDateTime.now().toString())
     val nowState: StateFlow<String> = _nowState
 
-    private val _delayedState = MutableStateFlow(LocalDateTime.now().toString())
+    private val _runningState = MutableStateFlow(false)
+    val runningState: StateFlow<Boolean> = _runningState
+
+    private val _secondsState = MutableStateFlow(0)
+    val secondsState: StateFlow<Boolean> = _secondsState
+
+    private val _delayedState = MutableStateFlow(LocalDateTime.now().toString(  ))
     val  delayedState : StateFlow<String> = _delayedState
+
+
 
     fun updateNow(){
         _nowState.value = LocalDateTime.now().toString()
@@ -26,5 +34,4 @@ class MainViewModel: ViewModel() {
             _delayedState.value = LocalDateTime.now().toString()
         }
     }
-
 }
