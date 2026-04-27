@@ -60,9 +60,16 @@ fun Posts(posts:List<PostDto>, onClick:()->Unit){
         Text(text = posts.size.toString())
         Button(onClick = onClick){
             Text(text = "fetch")
+
         }
+        PostList(posts)
     }
 }
+
+@Composable
+fun PostList(x0: List<PostDto>) {
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
