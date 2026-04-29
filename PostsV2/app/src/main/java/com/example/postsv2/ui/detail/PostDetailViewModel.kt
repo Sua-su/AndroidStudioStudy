@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.postsv2.data.dto.PostDto
 import com.example.postsv2.data.remote.RetrofitInstance
+import com.example.postsv2.data.repository.PostRepository
+import com.example.postsv2.data.repository.PostRepositoryRemoteImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +27,6 @@ class PostDetailViewModel(
 
     private val _uiState: MutableStateFlow<PostDetailUiState> = MutableStateFlow(PostDetailUiState.Loading)
     val uiState: StateFlow<PostDetailUiState> = _uiState.asStateFlow()
-
     init {
         loadPost()
     }
@@ -33,7 +34,7 @@ class PostDetailViewModel(
     private fun loadPost() {
         viewModelScope.launch {
             try {
-                val post = RetrofitInstance.postApi.getPost(postId)
+                val post = repository.getPost(postId)
                 _uiState.value = PostDetailUiState.Success(post)
             } catch (e: Exception) {
                 _uiState.value = PostDetailUiState.Error(e.message ?: "알 수 없는 오류가 발생했습니다")

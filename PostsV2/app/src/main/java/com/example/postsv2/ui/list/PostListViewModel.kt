@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.postsv2.data.dto.PostDto
 import com.example.postsv2.data.remote.RetrofitInstance
+import com.example.postsv2.data.repository.PostRepository
+import com.example.postsv2.data.repository.PostRepositoryRemoteImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
