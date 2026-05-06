@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 sealed interface PostListUiState {
     data object Loading : PostListUiState
@@ -17,8 +19,9 @@ sealed interface PostListUiState {
     data class Error(val message: String) : PostListUiState
 }
 
-class PostListViewModel(
-    private val repository: PostRepository = PostRepositoryRemoteImpl()
+@HiltViewModel
+class PostListViewModel @Inject constructor(
+    private val repository: PostRepository
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<PostListUiState> = MutableStateFlow(PostListUiState.Loading)
     val uiState: StateFlow<PostListUiState> = _uiState.asStateFlow()

@@ -1,14 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
-
 }
 
 android {
-    namespace = "com.example.postsv2"
+    namespace = "com.example.a1901153test"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -16,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.postsv2"
+        applicationId = "com.example.a1901153test"
         minSdk = 31
         targetSdk = 36
         versionCode = 1
@@ -52,20 +48,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation("com.google.dagger:hilt-android:2.59.2")
-    ksp("com.google.dagger:hilt-compiler:2.59.2")
-
-
-
-
-
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.serialization)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    //implementation(libs.androidx.lifecycle.runtime.compose)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
