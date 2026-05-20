@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class MovieRepository @Inject constructor(
     private val apiService: TmdbApiService
 ) {
-    // API 키 (초보자 스타일 - 실제로는 절대 이렇게 하면 안 됨!)
+    // API 키
     private val apiKey = "c12ed457b94399d3c810d10b94e4e4c5"
 
     suspend fun getNowPlayingMovies(): List<MovieDto> {

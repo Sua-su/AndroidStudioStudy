@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // TMDB 기본 URL (하드코딩)
+    // TMDB
     private const val BASE_URL = "https://api.themoviedb.org/3/"
 
     @Provides
