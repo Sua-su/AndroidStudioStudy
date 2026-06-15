@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -36,42 +37,50 @@ fun HomeScreen(
         error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
-        Scaffold(
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text("TMRB Movies") },
-                    actions = {
-                        IconButton(onClick = { viewModel.fetchPopularMovies() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
-                        }
-                    }
-                )
-            }
-        ) { padding ->
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if (movies.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("No movies found.")
-                        Button(onClick = { viewModel.fetchPopularMovies() }) {
-                            Text("Retry")
-                        }
-                    }
-                }
-            } else {
-        ...
+        }
+    }
 
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("TMRB Movies") },
+                actions = {
+                    IconButton(onClick = { viewModel.fetchPopularMovies() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else if (movies.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("No movies found.")
+                    Button(onClick = { viewModel.fetchPopularMovies() }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(8.dp),
                 modifier = Modifier.padding(padding)
             ) {
-                items(movies) { movie ->
+                items(movies.size) { index ->
+                    val movie = movies[index]
                     MovieItem(movie = movie, onClick = { onMovieClick(movie.id) })
+                    
+                    if (index >= movies.size - 4 && !isLoading) {
+                        LaunchedEffect(index) {
+                            viewModel.loadMore()
+                        }
+                    }
                 }
             }
         }
@@ -81,10 +90,10 @@ fun HomeScreen(
 @Composable
 fun MovieItem(movie: Movie, onClick: () -> Unit) {
     Card(
+        onClick = onClick,
         modifier = Modifier
             .padding(4.dp)
-            .fillMaxWidth()
-            .clickable { onClick() },
+            .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {

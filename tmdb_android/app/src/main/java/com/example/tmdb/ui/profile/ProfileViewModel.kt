@@ -1,3 +1,6 @@
+package com.example.tmdb.ui.profile
+
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tmdb.data.repository.MovieRepository
@@ -8,20 +11,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
-    private val _nickname = MutableStateFlow<String?>(null)
+    private val _nickname = MutableStateFlow<String?>(sharedPreferences.getString("nickname", null))
     val nickname: StateFlow<String?> = _nickname
 
     val achievements: StateFlow<List<Achievement>> = repository.getAllAchievements()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-...
 
     fun setNickname(name: String) {
-        _nickname.value = if (name.isBlank()) null else name
+        val newName = if (name.isBlank()) null else name
+        _nickname.value = newName
+        sharedPreferences.edit().putString("nickname", newName).apply()
     }
 
     fun logout() {
         _nickname.value = null
+        sharedPreferences.edit().remove("nickname").apply()
     }
 }

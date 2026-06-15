@@ -9,5 +9,6 @@ data class Post(
     val title: String,
     val content: String,
     val authorNickname: String?, // Null means anonymous
+    val authorId: Long? = null,
     val createdAt: Long = System.currentTimeMillis()
 )

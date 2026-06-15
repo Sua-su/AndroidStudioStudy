@@ -24,22 +24,37 @@ class HomeViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private var currentPage = 1
+    private var isLastPage = false
+
     init {
         fetchPopularMovies()
     }
 
     fun fetchPopularMovies() {
+        if (_isLoading.value) return
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                _movies.value = repository.getPopularMovies()
+                val newMovies = repository.getPopularMovies(currentPage)
+                if (newMovies.isEmpty()) {
+                    isLastPage = true
+                } else {
+                    _movies.value = if (currentPage == 1) newMovies else _movies.value + newMovies
+                }
             } catch (e: Exception) {
                 _error.value = "Failed to load movies: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+    fun loadMore() {
+        if (isLoading.value || isLastPage) return
+        currentPage++
+        fetchPopularMovies()
     }
 
     fun clearError() {

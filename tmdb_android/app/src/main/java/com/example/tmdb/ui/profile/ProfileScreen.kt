@@ -17,15 +17,15 @@ import com.example.tmdb.model.Achievement
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    onLogoutClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val nickname by viewModel.nickname.collectAsState()
-    var tempNickname by remember { mutableStateOf(nickname ?: "") }
     val achievements by viewModel.achievements.collectAsState()
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text("Profile Settings") })
+            CenterAlignedTopAppBar(title = { Text("Profile") })
         }
     ) { padding ->
         Column(
@@ -33,14 +33,14 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (nickname != null) "Welcome, $nickname!" else "You are browsing anonymously",
+                text = if (nickname != null) "Welcome, $nickname!" else "Not Logged In",
                 style = MaterialTheme.typography.headlineSmall
             )
 
             Text(
                 "My Badges",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 32.dp)
             )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
@@ -51,30 +51,14 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = tempNickname,
-                onValueChange = { tempNickname = it },
-                label = { Text("Enter Nickname") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.weight(1f))
+
             Button(
-                onClick = { viewModel.setNickname(tempNickname) },
-                modifier = Modifier.fillMaxWidth()
+                onClick = onLogoutClick,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Text("Save Nickname")
-            }
-            if (nickname != null) {
-                TextButton(
-                    onClick = {
-                        viewModel.logout()
-                        tempNickname = ""
-                    },
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Text("Logout (Go Anonymous)")
-                }
+                Text("Logout")
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.tmdb
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,8 +20,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.tmdb.ui.auth.LoginScreen
+import com.example.tmdb.ui.auth.SignupScreen
 import com.example.tmdb.ui.board.BoardScreen
 import com.example.tmdb.ui.board.PostAddScreen
+import com.example.tmdb.ui.board.PostDetailScreen
 import com.example.tmdb.ui.detail.DetailScreen
 import com.example.tmdb.ui.home.HomeScreen
 import com.example.tmdb.ui.profile.ProfileScreen
@@ -30,18 +34,30 @@ import com.example.tmdb.ui.search.SearchScreen
 import com.example.tmdb.ui.trend.TrendScreen
 import com.example.tmdb.ui.theme.TmdbTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val startDestination = if (sharedPreferences.getLong("loggedInUserId", -1L) != -1L) {
+            "main_flow"
+        } else {
+            "login"
+        }
+
         setContent {
             TmdbTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TmdbApp()
+                    TmdbAppRoot(startDestination)
                 }
             }
         }
@@ -58,7 +74,47 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
 }
 
 @Composable
-fun TmdbApp(profileViewModel: ProfileViewModel = hiltViewModel()) {
+fun TmdbAppRoot(startDestination: String) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("login") {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate("main_flow") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onNavigateToSignup = { navController.navigate("signup") }
+            )
+        }
+        composable("signup") {
+            SignupScreen(
+                onSignupSuccess = {
+                    navController.navigate("main_flow") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onBackToLogin = { navController.popBackStack() }
+            )
+        }
+        composable("main_flow") {
+            TmdbAppMain(
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo("main_flow") { inclusive = true }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun TmdbAppMain(
+    onLogout: () -> Unit,
+    profileViewModel: ProfileViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val items = listOf(Screen.Home, Screen.Trend, Screen.Search, Screen.Board, Screen.Reviews, Screen.Profile)
     val nickname by profileViewModel.nickname.collectAsState()
@@ -98,7 +154,9 @@ fun TmdbApp(profileViewModel: ProfileViewModel = hiltViewModel()) {
                 })
             }
             composable(Screen.Trend.route) {
-                TrendScreen()
+                TrendScreen(onMovieClick = { movieId ->
+                    navController.navigate("detail/$movieId")
+                })
             }
             composable(Screen.Search.route) {
                 SearchScreen(onMovieClick = { movieId ->
@@ -106,14 +164,24 @@ fun TmdbApp(profileViewModel: ProfileViewModel = hiltViewModel()) {
                 })
             }
             composable(Screen.Board.route) {
-                BoardScreen(onAddPostClick = {
-                    navController.navigate("post_add")
-                })
+                BoardScreen(
+                    onAddPostClick = { navController.navigate("post_add") },
+                    onPostClick = { postId -> navController.navigate("post_detail/$postId") }
+                )
             }
             composable("post_add") {
                 PostAddScreen(
                     onBackClick = { navController.popBackStack() },
                     authorNickname = nickname
+                )
+            }
+            composable(
+                route = "post_detail/{postId}",
+                arguments = listOf(navArgument("postId") { type = NavType.IntType })
+            ) {
+                PostDetailScreen(
+                    onBackClick = { navController.popBackStack() },
+                    currentUserNickname = nickname
                 )
             }
             composable(Screen.Reviews.route) {
@@ -122,7 +190,13 @@ fun TmdbApp(profileViewModel: ProfileViewModel = hiltViewModel()) {
                 })
             }
             composable(Screen.Profile.route) {
-                ProfileScreen(viewModel = profileViewModel)
+                ProfileScreen(
+                    viewModel = profileViewModel,
+                    onLogoutClick = {
+                        profileViewModel.logout()
+                        onLogout()
+                    }
+                )
             }
             composable(
                 route = "detail/{movieId}",

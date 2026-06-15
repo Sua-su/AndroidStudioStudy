@@ -10,7 +10,8 @@ interface TmdbApiService {
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "ko-KR"
+        @Query("language") language: String = "ko-KR",
+        @Query("page") page: Int = 1
     ): MovieResponse
 
     @GET("search/movie")

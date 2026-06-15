@@ -1,6 +1,7 @@
 package com.example.tmdb.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.tmdb.data.local.AchievementDao
 import com.example.tmdb.data.local.AppDatabase
@@ -19,6 +20,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("tmdb_prefs", Context.MODE_PRIVATE)
+    }
 
     @Provides
     @Singleton
@@ -55,5 +62,15 @@ object AppModule {
     @Provides
     fun provideAchievementDao(database: AppDatabase): AchievementDao {
         return database.achievementDao()
+    }
+
+    @Provides
+    fun provideCommentDao(database: AppDatabase): com.example.tmdb.data.local.CommentDao {
+        return database.commentDao()
+    }
+
+    @Provides
+    fun provideUserDao(database: AppDatabase): com.example.tmdb.data.local.UserDao {
+        return database.userDao()
     }
 }

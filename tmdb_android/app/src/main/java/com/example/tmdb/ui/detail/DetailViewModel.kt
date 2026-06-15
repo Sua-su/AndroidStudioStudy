@@ -1,5 +1,6 @@
 package com.example.tmdb.ui.detail
 
+import android.content.SharedPreferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,10 +15,11 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: MovieRepository,
+    private val sharedPreferences: SharedPreferences,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val movieId: Int = checkNotNull(savedStateHandle["movieId"])
+    private val movieId: Int = savedStateHandle.get<Int>("movieId") ?: 0
 
     private val _movie = MutableStateFlow<Movie?>(null)
     val movie: StateFlow<Movie?> = _movie
@@ -28,12 +30,12 @@ class DetailViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     init {
         fetchMovieDetails()
     }
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
 
     private fun fetchMovieDetails() {
         viewModelScope.launch {
@@ -52,11 +54,15 @@ class DetailViewModel @Inject constructor(
     fun addReview(rating: Float, comment: String) {
         viewModelScope.launch {
             val movie = _movie.value ?: return@launch
+            val nickname = sharedPreferences.getString("nickname", null)
+            val userId = sharedPreferences.getLong("loggedInUserId", -1L)
             val review = Review(
                 movieId = movieId,
                 movieTitle = movie.title,
                 rating = rating,
-                comment = comment
+                comment = comment,
+                authorNickname = nickname,
+                authorId = if (userId != -1L) userId else null
             )
             repository.addReview(review)
         }

@@ -1,5 +1,6 @@
 package com.example.tmdb.ui.board
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tmdb.data.repository.MovieRepository
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BoardViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     val posts: StateFlow<List<Post>> = repository.getAllPosts()
@@ -26,7 +28,15 @@ class BoardViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            repository.addPost(Post(title = title, content = content, authorNickname = author))
+            val userId = sharedPreferences.getLong("loggedInUserId", -1L)
+            repository.addPost(
+                Post(
+                    title = title, 
+                    content = content, 
+                    authorNickname = author,
+                    authorId = if (userId != -1L) userId else null
+                )
+            )
         }
     }
 

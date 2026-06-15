@@ -1,5 +1,6 @@
 package com.example.tmdb.ui.reviews
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tmdb.data.repository.MovieRepository
@@ -13,10 +14,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ReviewsViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: MovieRepository,
+    sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    val reviews: StateFlow<List<Review>> = repository.getAllReviews()
+    val reviews: StateFlow<List<Review>> = repository.getReviewsByUserId(sharedPreferences.getLong("loggedInUserId", -1L))
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun deleteReview(review: Review) {

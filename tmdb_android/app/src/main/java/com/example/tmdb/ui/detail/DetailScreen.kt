@@ -59,7 +59,7 @@ fun DetailScreen(
             }
         } else {
             movie?.let { m ->
-                LazyColumn(modifier = Modifier.padding(padding)) {
+                LazyColumn(modifier = Modifier.padding(padding).fillMaxSize()) {
                     item { MovieHeader(m) }
                     item {
                         ReviewForm(
@@ -94,8 +94,8 @@ fun MovieHeader(movie: Movie) {
             contentDescription = movie.title,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp),
-            contentScale = ContentScale.Crop
+                .heightIn(min = 300.dp, max = 450.dp),
+            contentScale = ContentScale.Fit
         )
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = movie.title, style = MaterialTheme.typography.headlineMedium)

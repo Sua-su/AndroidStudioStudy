@@ -23,6 +23,7 @@ import java.util.*
 @Composable
 fun BoardScreen(
     onAddPostClick: () -> Unit,
+    onPostClick: (Int) -> Unit,
     viewModel: BoardViewModel = hiltViewModel()
 ) {
     val posts by viewModel.posts.collectAsState()
@@ -39,16 +40,23 @@ fun BoardScreen(
     ) { padding ->
         LazyColumn(modifier = Modifier.padding(padding).fillMaxSize()) {
             items(posts) { post ->
-                PostItem(post = post, onDelete = { viewModel.deletePost(post) })
+                PostItem(
+                    post = post,
+                    onClick = { onPostClick(post.id.toInt()) },
+                    onDelete = { viewModel.deletePost(post) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun PostItem(post: Post, onDelete: () -> Unit) {
+fun PostItem(post: Post, onClick: () -> Unit, onDelete: () -> Unit) {
     val date = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(post.createdAt))
-    Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().padding(8.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(

@@ -16,7 +16,8 @@ class MovieRepository @Inject constructor(
     private val apiService: TmdbApiService,
     private val reviewDao: ReviewDao,
     private val postDao: PostDao,
-    private val achievementDao: AchievementDao
+    private val achievementDao: AchievementDao,
+    private val commentDao: com.example.tmdb.data.local.CommentDao
 ) {
     private val apiKey = "c12ed457b94399d3c810d10b94e4e4c5"
 
@@ -31,8 +32,8 @@ class MovieRepository @Inject constructor(
         }
     }
 
-    suspend fun getPopularMovies(): List<Movie> {
-        return apiService.getPopularMovies(apiKey).results.map { it.toDomain() }
+    suspend fun getPopularMovies(page: Int = 1): List<Movie> {
+        return apiService.getPopularMovies(apiKey, language = "ko-KR", page = page).results.map { it.toDomain() }
     }
 
     suspend fun searchMovies(query: String): List<Movie> {
@@ -44,6 +45,10 @@ class MovieRepository @Inject constructor(
     }
 
     fun getAllReviews(): Flow<List<Review>> = reviewDao.getAllReviews()
+
+    fun getReviewsByUser(nickname: String?): Flow<List<Review>> = reviewDao.getReviewsByUser(nickname)
+
+    fun getReviewsByUserId(userId: Long): Flow<List<Review>> = reviewDao.getReviewsByUserId(userId)
 
     fun getReviewsForMovie(movieId: Int): Flow<List<Review>> = reviewDao.getReviewsForMovie(movieId)
 
@@ -68,9 +73,18 @@ class MovieRepository @Inject constructor(
     // Board / Post
     fun getAllPosts(): Flow<List<Post>> = postDao.getAllPosts()
 
+    suspend fun getPostById(postId: Long): Post? = postDao.getPostById(postId)
+
     suspend fun addPost(post: Post) = postDao.insertPost(post)
 
     suspend fun updatePost(post: Post) = postDao.updatePost(post)
 
     suspend fun deletePost(post: Post) = postDao.deletePost(post)
+
+    // Comments
+    fun getCommentsForPost(postId: Int): Flow<List<Comment>> = commentDao.getCommentsForPost(postId)
+
+    suspend fun addComment(comment: Comment) = commentDao.insertComment(comment)
+
+    suspend fun deleteComment(comment: Comment) = commentDao.deleteComment(comment)
 }

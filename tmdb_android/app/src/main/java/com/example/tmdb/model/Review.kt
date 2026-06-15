@@ -10,5 +10,7 @@ data class Review(
     val movieTitle: String,
     val rating: Float,
     val comment: String,
+    val authorNickname: String? = null,
+    val authorId: Long? = null,
     val createdAt: Long = System.currentTimeMillis()
 )
